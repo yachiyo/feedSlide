@@ -1,0 +1,62 @@
+<style type="text/css">
+.item {
+  position:absolute;
+  padding:2px;
+}
+</style>
+
+<script src="https://www.google.com/jsapi" type="text/javascript"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var currentPage = 0;
+  var items = 5;
+
+  google.load("feeds", "1");
+  
+  function initialize() {
+  var feed = new google.feeds.Feed("http://www.jaxa.jp/rss/new_j.rdf");
+  feed.setNumEntries(5);
+  feed.load(function(result) {
+      if (!result.error) {
+        var container = document.getElementById("itemlist");
+        for (var i = 0; i < result.feed.entries.length; i++) {
+          var entry = result.feed.entries[i];
+          var eimg = "";
+    			var imgCheck = entry.content.match(/(src="http:){1}[\S_-]+((\.jpg)|(\.JPG))/);
+    			if(imgCheck){
+    			         eimg += '<img ' + imgCheck[0] + '" width="225" height="180">';
+    			      }
+          var div = document.createElement("div");
+          div.innerHTML = '<dl><dt>' + eimg + '</dt><dd><a href="' + entry.link + '"><strong>' + entry.title + '</strong></a><br />' + entry.contentSnippet.substring(0,50) + '<a href="' + entry.link + '">...</a></dd></dl></div>';
+          div.className = 'item';
+          div.id = "item" + i;
+          container.appendChild(div);
+          if (i > 0) $("#item" + i).hide();
+        }
+        items = result.feed.entries.length;
+      }
+    });
+  }
+  google.setOnLoadCallback(initialize);
+
+</script>
+
+<div id="picitem" style="height:420px;position:relative;"></div>
+<script type="text/javascript">
+function timer_event() {
+  var nextPage = currentPage + 1;
+  if (nextPage == items) {
+    nextPage = 0;
+    } 
+  if ( currentPage == nextPage) {
+	  	$("#items" + currentPage).show();
+	  	clearInterval(timer);
+  } else{
+		  $("#items" + currentPage).fadeOut('slow');
+		  $("#items" + nextPage).fadeIn('slow');	 
+		  } 	 
+  currentPage = nextPage;
+}
+timer = setInterval("timer_event()", 5000);
+</script>
